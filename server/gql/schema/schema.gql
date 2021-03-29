@@ -1,74 +1,116 @@
 schema {
+    # The Query Entrypoint.
     query: Query
+    # The mutation Entrypoint.
     mutation: Mutation
+    # The Subscription Entrypoint.
     subscription: Subscription
 }
 
 type Query {
+    # Fetch a poll by ID.
     poll(id: String!): Poll
+    # Fetch a draft by ID.
     draft(id: String!): Draft
 }
 
 type Mutation {
+    # Vote on a poll by passing a array of index selections.
     vote(id: String!, selection: [Int!]!): ResultState!
-    new(poll: PollInput!): Result!
-    newDraft(poll: PollInput!): ResultDraft!
+    # Create a new poll by passing a partial poll Object.
+    new(poll: PollDraftInput!): Result!
+    # Create a new draft by passing a partial poll Object.
+    newDraft(poll: PollDraftInput!): ResultDraft!
 }
 
 type Subscription {
+    # Watch a poll for changes.
     watch(id: String!): Poll
 }
 
 type Draft {
+    # The id of the draft.
     id: String!
+    # The title of the draft.
     title: String!
+    # The options in the draft.
     options: [String!]!
+    # Check ip set on draft. Makes sure no IP can answer the same poll twice.
     check_ip: Boolean!
+    # Multiple Selections are allowed.
     multi_answer: Boolean!
+    # The expiry time on the poll.
     expiry: Int
+    # The date the draft was created in ISO_8601.
     created_at: String!
 }
 
 type Poll {
+    # The id of the poll.
     id: String!
+    # The title of the poll.
     title: String!
+    # The options on this poll.
     options: [PollOption!]!
+    # If the poll has check ip enabled.
     check_ip: Boolean!
+    # If multiple poll answers are allowed.
     multi_answer: Boolean!
+    # The date the poll will expire in ISO_8601.
     expiry: String
+    # The date the poll was created in ISO_8601.
     created_at: String!
 }
 
 type PollOption {
+    # The title of the option.
     title: String!
+    # The number of votes that option has.
     votes: Int!
 }
 
-input PollInput {
+input PollDraftInput {
+    # The title of a poll or draft
     title: String!
+    # The options in a poll or draft. 
     options: [String!]!
+    # Check ip. Makes sure no IP can answer the same poll twice.
     check_ip: Boolean
+    # If multiple poll answers are allowed.
     multi_answer: Boolean
+    # The number of seconds after creation that the poll will be answerable.
     expiry: Int
 }
 
 type Result {
+    # The status of a request.
     state: ResultState!
+    # The poll created.
     poll: Poll
 }
 
 type ResultDraft {
+    # The status of a request.
     state: ResultState!
+    # The draft created.
     poll: Draft
 }
 
 enum ResultState {
-  MISSING_POLL
-  ALREADY_VOTED
-  INVALID_TITLE
-  INVALID_OPTIONS
-  INVALID_SELECTION
-  INVALID_EXPIRY
-  EXPIRED
-  SUCCESS
+    # The poll was not found, returned on vote.
+    MISSING_POLL
+    # You have already voted or your ip has, returned on vote.
+    ALREADY_VOTED
+    # The title you supplied is not valid. Returned on create new draft or poll.
+    INVALID_TITLE
+    # The options you provided are not valid. You cannot have more then 15 and the options must have titles and also be less than 64 characters. Returned on create new draft or poll.
+    INVALID_OPTIONS
+    # The selection you provided is not valid. Returned on vote.
+    INVALID_SELECTION
+    # The expiry you provided is not valid, you cannot submit an expiry less than 60 seconds. Returned on create new draft or poll.
+    INVALID_EXPIRY
+    # The vote failed because the poll has already expired.
+    EXPIRED
+    # The operation succeeded.
+    SUCCESS
 }
