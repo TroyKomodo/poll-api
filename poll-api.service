@@ -1,0 +1,14 @@
+[Unit]
+  
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+ExecStart=/opt/api.poll.komodohype.dev/api.poll.komodohype.dev
+WorkingDirectory=/opt/api.poll.komodohype.dev/
+User=root
+Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=%n

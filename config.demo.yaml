@@ -1,0 +1,9 @@
+level: "info"
+
+redis_uri: ""
+
+mongo_uri: ""
+
+mongo_db: ""
+
+exit_code: 0

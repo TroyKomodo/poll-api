@@ -1,0 +1,74 @@
+schema {
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
+}
+
+type Query {
+    poll(id: String!): Poll
+    draft(id: String!): Draft
+}
+
+type Mutation {
+    vote(id: String!, selection: [Int!]!): ResultState!
+    new(poll: PollInput!): Result!
+    newDraft(poll: PollInput!): ResultDraft!
+}
+
+type Subscription {
+    watch(id: String!): Poll
+}
+
+type Draft {
+    id: String!
+    title: String!
+    options: [String!]!
+    check_ip: Boolean!
+    multi_answer: Boolean!
+    expiry: Int
+    created_at: String!
+}
+
+type Poll {
+    id: String!
+    title: String!
+    options: [PollOption!]!
+    check_ip: Boolean!
+    multi_answer: Boolean!
+    expiry: String
+    created_at: String!
+}
+
+type PollOption {
+    title: String!
+    votes: Int!
+}
+
+input PollInput {
+    title: String!
+    options: [String!]!
+    check_ip: Boolean
+    multi_answer: Boolean
+    expiry: Int
+}
+
+type Result {
+    state: ResultState!
+    poll: Poll
+}
+
+type ResultDraft {
+    state: ResultState!
+    poll: Draft
+}
+
+enum ResultState {
+  MISSING_POLL
+  ALREADY_VOTED
+  INVALID_TITLE
+  INVALID_OPTIONS
+  INVALID_SELECTION
+  INVALID_EXPIRY
+  EXPIRED
+  SUCCESS
+}
