@@ -63,7 +63,7 @@ func (*RootResolver) Draft(ctx context.Context, args struct{ ID string }) (*draf
 			return nil, nil
 		}
 		if err == nil {
-			result.Decode(draft)
+			err = result.Decode(draft)
 		}
 		if err != nil {
 			log.Errorf("mongo, err=%v", err)

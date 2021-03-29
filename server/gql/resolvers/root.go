@@ -50,7 +50,7 @@ func New() *RootResolver {
 				for _, c := range v {
 					go func(c chan PollVote) {
 						defer wg.Done()
-						defer recover()
+						defer recover() //nolint
 						c <- vote
 					}(c)
 				}
@@ -178,7 +178,7 @@ func fetchPoll(id primitive.ObjectID, field *selectedField) (*mongo.Poll, error)
 			return nil, nil
 		}
 		if err == nil {
-			result.Decode(poll)
+			err = result.Decode(poll)
 		}
 		if err != nil {
 			log.Errorf("mongo, err=%v", err)

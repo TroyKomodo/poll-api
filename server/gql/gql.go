@@ -53,7 +53,14 @@ func GQL(app fiber.Router) {
 		// IsWebSocketUpgrade returns true if the client
 		// requested upgrade to the WebSocket protocol.
 		if websocket.IsWebSocketUpgrade(c) {
-			c.Locals("ip", c.IP())
+			var ip string
+			ips := c.IPs()
+			if len(ips) > 0 {
+				ip = ips[0]
+			} else {
+				ip = c.IP()
+			}
+			c.Locals("ip", ip)
 			return c.Next()
 		}
 		return c.SendStatus(426)
@@ -78,7 +85,15 @@ func GQL(app fiber.Router) {
 			})
 		}
 
-		result := schema.Exec(context.WithValue(context.Background(), utils.Key("ip"), c.IP()), req.Query, req.OperationName, req.Variables)
+		var ip string
+		ips := c.IPs()
+		if len(ips) > 0 {
+			ip = ips[0]
+		} else {
+			ip = c.IP()
+		}
+
+		result := schema.Exec(context.WithValue(context.Background(), utils.Key("ip"), ip), req.Query, req.OperationName, req.Variables)
 
 		status := 200
 
@@ -165,7 +180,7 @@ func GQL(app fiber.Router) {
 						return
 					}
 					mtx.Lock()
-					c.WriteMessage(websocket.TextMessage, data)
+					c.WriteMessage(websocket.TextMessage, data) //nolint
 					mtx.Unlock()
 					return
 				}
@@ -183,7 +198,7 @@ func GQL(app fiber.Router) {
 						return
 					}
 					mtx.Lock()
-					c.WriteMessage(websocket.TextMessage, data)
+					c.WriteMessage(websocket.TextMessage, data) //nolint
 					mtx.Unlock()
 					return
 				}
