@@ -113,7 +113,7 @@ func GQL(app fiber.Router) {
 				select {
 				case <-time.After(60 * time.Second):
 					mtx.Lock()
-					if err = c.WriteMessage(websocket.TextMessage, utils.S2B("HEARTBEAT")); err != nil {
+					if err = c.WriteMessage(websocket.TextMessage, utils.S2B(`{"event":"HEARTBEAT"}`)); err != nil {
 						mtx.Unlock()
 						break
 					}
