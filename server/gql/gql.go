@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
@@ -107,12 +108,21 @@ func GQL(app fiber.Router) {
 	gql.Get("/", websocket.New(func(c *websocket.Conn) {
 		closeChan := make(chan struct{})
 		mtx := &sync.Mutex{}
+		closed := false
 		events := map[string]chan struct{}{}
+		defer func() {
+			if err := recover(); err != nil {
+				log.Errorf("panic, recovered=%v", spew.Sdump(err))
+			}
+		}()
 		go func() {
 			for {
 				select {
 				case <-time.After(60 * time.Second):
 					mtx.Lock()
+					if closed {
+						return
+					}
 					if err = c.WriteMessage(websocket.TextMessage, utils.S2B(`{"event":"HEARTBEAT"}`)); err != nil {
 						mtx.Unlock()
 						break
@@ -123,7 +133,12 @@ func GQL(app fiber.Router) {
 				}
 			}
 		}()
-		defer close(closeChan)
+		defer func() {
+			mtx.Lock()
+			close(closeChan)
+			closed = true
+			mtx.Unlock()
+		}()
 		var (
 			mt   int
 			msg  []byte
