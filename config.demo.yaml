@@ -1,9 +1,10 @@
 level: "info"
 
-redis_uri: ""
+redis_uri: "redis://127.0.0.1:6379/0"
+mongo_uri: "mongodb://127.0.0.1:27017"
+mongo_db: "poll"
 
-mongo_uri: ""
-
-mongo_db: ""
+listener_network: "tcp"
+listener_address: "127.0.0.1:8080"
 
 exit_code: 0
