@@ -41,7 +41,7 @@ func (r *RootResolver) Watch(ctx context.Context, args struct{ ID string }) (<-c
 	resolver.poll = poll
 
 	if fetchVotes {
-		vote := make(chan PollVote)
+		vote := make(chan PollVote, 100)
 
 		err = r.subscribe(fmt.Sprintf("events:poll:vote:%s", poll.ID.Hex()), vote)
 		if err != nil {

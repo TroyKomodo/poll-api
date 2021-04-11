@@ -49,8 +49,12 @@ func New() *RootResolver {
 				wg.Add(len(v))
 				for _, c := range v {
 					go func(c chan PollVote) {
-						defer wg.Done()
-						defer recover() //nolint
+						defer func() {
+							if err := recover(); err != nil {
+								log.Errorf("recovered, err=%v", err)
+							}
+						}()
+						wg.Done()
 						c <- vote
 					}(c)
 				}
